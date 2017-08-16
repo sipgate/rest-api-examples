@@ -5,7 +5,7 @@ const request = require('request-promise-native');
 const createApiClient = require('sipgate-rest-api-client').default;
 
 // sipgate REST API settings
-const apiUrl = 'https://api.sipgate.com/v1';
+const apiUrl = 'https://api.sipgate.com/v2';
 const desiredScope = 'balance:read';
 const clientId = process.env.npm_config_client_id;
 const clientSecret = process.env.npm_config_client_secret;
@@ -20,13 +20,14 @@ const port = process.env.npm_config_port;
 const appUrl = `http://localhost:${port}`;
 const authPath = '/authorize';
 const authRedirectUrl = `${appUrl}${authPath}`;
-const apiAuthUrl = `${apiUrl}/authorization/oauth/authorize?` + queryString.stringify({
+const authUrl = `https://api.sipgate.com/login/third-party/protocol/openid-connect`;
+const apiAuthUrl = `${authUrl}/auth?` + queryString.stringify({
     client_id: clientId,
     redirect_uri: authRedirectUrl,
     scope: desiredScope,
     response_type: 'code',
   });
-const tokenUrl = `${apiUrl}/authorization/oauth/token`;
+
 
 // Initialize express app
 const app = express();
@@ -39,6 +40,7 @@ app.use(session({
 
 app.get('/', function (req, res) {
   const accessToken = req.session['accessToken'];
+
   if (!accessToken) {
     res.redirect(authPath);
     return;
@@ -64,14 +66,19 @@ app.get('/', function (req, res) {
 });
 
 app.get(authPath, function (req, res) {
+
   const authorizationCode = req.query.code;
+
   if (!authorizationCode) {
+    console.log("Not authenticated yet! Redirecting to " + apiAuthUrl);
     res.redirect(apiAuthUrl);
     return;
   }
 
+  console.log("Got authorization code: " + authorizationCode);
+
   request.post({
-    url: tokenUrl,
+    url: `${authUrl}/token`,
     form: {
       client_id: clientId,
       client_secret: clientSecret,
@@ -82,10 +89,12 @@ app.get(authPath, function (req, res) {
   })
     .then(function (body) {
       const response = JSON.parse(body);
+      console.log("Got authorization data", response)
       req.session['accessToken'] = response['access_token'];
       res.redirect('/');
     })
-    .catch(function () {
+    .catch(function (e) {
+      console.log("Error getting access_token");
       res.redirect(apiAuthUrl);
     });
 });
