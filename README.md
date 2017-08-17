@@ -1,6 +1,6 @@
 # Simple sipgate REST API demo project
 
-This project shows how to use the [sipgate REST API](https://api.sipgate.com/doc/). Please read the [step-by-step guide](https://book.sipgate.io/content/using-the-rest-api-with-node.js.html).
+This project shows how to use the [sipgate REST API](https://developer.sipgate.io/v2.0/reference). Please read the [step-by-step guide](https://book.sipgate.io/content/using-the-rest-api-with-node.js.html).
 
 ## Install
 
