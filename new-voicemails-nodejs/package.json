@@ -1,0 +1,17 @@
+{
+  "name": "sipgate-new-voicemails",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Node.js script that retrieves new sipgate voicemails",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "moment": "^2.18.1",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.3"
+  }
+}

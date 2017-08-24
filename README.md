@@ -5,3 +5,4 @@ This repository shows you how to use the [sipgate REST API](https://developer.si
 ## Examples
 
 * `webapp-nodejs`: simple Node.js web application with OAuth authentication
+* `new-voicemails-nodejs`: Node.js script that retrieves new sipgate voicemails
