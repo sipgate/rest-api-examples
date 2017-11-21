@@ -2,7 +2,7 @@ require("dotenv").config();
 const moment = require("moment");
 const request = require("request-promise-native");
 
-const apiUrl = "https://api.sipgate.com/v2";
+const apiUrl = "https://api.sipgate.com/v1";
 const NO_OP = () => {};
 const email = process.env.EMAIL;
 const password = process.env.PASSWORD;
