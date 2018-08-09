@@ -65,6 +65,29 @@ app.get('/', function (req, res) {
     });
 });
 
+const fetchToken = function(url, authorizationCode) {
+  console.log({ url, authorizationCode });
+  return request.post({
+    url,
+    form: {
+      client_id: clientId,
+      client_secret: clientSecret,
+      code: authorizationCode,
+      redirect_uri: authRedirectUrl,
+      grant_type: 'authorization_code',
+    },
+    simple: false,
+    resolveWithFullResponse: true,
+  })
+  .then(function(response) {
+    console.log('status', response.statusCode);
+    if ([307, 308].includes(response.statusCode)) {
+      return fetchToken(response.headers['location'], authorizationCode);
+    }
+    return response;
+  })
+};
+
 app.get(authPath, function (req, res) {
 
   const authorizationCode = req.query.code;
@@ -77,24 +100,16 @@ app.get(authPath, function (req, res) {
 
   console.log("Got authorization code: " + authorizationCode);
 
-  request.post({
-    url: `${authUrl}/token`,
-    form: {
-      client_id: clientId,
-      client_secret: clientSecret,
-      code: authorizationCode,
-      redirect_uri: authRedirectUrl,
-      grant_type: 'authorization_code',
-    },
-  })
-    .then(function (body) {
-      const response = JSON.parse(body);
-      console.log("Got authorization data", response)
-      req.session['accessToken'] = response['access_token'];
+  fetchToken(`${authUrl}/token`, authorizationCode)
+    .then(function (response) {
+      const body =  response.body;
+      const payload = JSON.parse(body);
+      console.log("Got authorization data", payload)
+      req.session['accessToken'] = payload['access_token'];
       res.redirect('/');
     })
     .catch(function (e) {
-      console.log("Error getting access_token");
+      console.log("Error getting access_token", e);
       res.redirect(apiAuthUrl);
     });
 });
