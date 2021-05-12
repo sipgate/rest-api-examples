@@ -7,8 +7,10 @@ const createApiClient = require('sipgate-rest-api-client').default;
 // sipgate REST API settings
 const apiUrl = 'https://api.sipgate.com/v2';
 const desiredScope = 'balance:read';
+
 const clientId = process.env.npm_config_client_id;
 const clientSecret = process.env.npm_config_client_secret;
+const realm = process.env.npm_config_realm;
 
 if (!clientId || clientId === 'CLIENT_ID' || !clientSecret || clientSecret === 'CLIENT_SECRET') {
   console.log('Please provide a client id and secret in this project .npmrc file.');
@@ -20,12 +22,13 @@ const port = process.env.npm_config_port;
 const appUrl = `http://localhost:${port}`;
 const authPath = '/authorize';
 const authRedirectUrl = `${appUrl}${authPath}`;
-const authUrl = `https://api.sipgate.com/login/third-party/protocol/openid-connect`;
-const apiAuthUrl = `${authUrl}/auth?` + queryString.stringify({
-    client_id: clientId,
-    redirect_uri: authRedirectUrl,
-    scope: desiredScope,
-    response_type: 'code',
+const authUrl = `https://login.sipgate.com/auth/realms/${realm}/protocol/openid-connect`
+const apiAuthUrl = `${authUrl}/auth?`
+  + queryString.stringify({
+      client_id: clientId,
+      redirect_uri: authRedirectUrl,
+      scope: desiredScope,
+      response_type: 'code',
   });
 
 
